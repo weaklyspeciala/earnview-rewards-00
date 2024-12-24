@@ -16,6 +16,21 @@ const Register = () => {
     confirmPassword: ""
   });
 
+  const validatePassword = (password: string) => {
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    const isLongEnough = password.length >= 6;
+
+    if (!hasLowerCase || !hasUpperCase || !hasNumber || !isLongEnough) {
+      return {
+        isValid: false,
+        message: "Password must contain at least:\n- One lowercase letter\n- One uppercase letter\n- One number\n- 6 characters minimum"
+      };
+    }
+    return { isValid: true, message: "" };
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     setFormData(prev => ({
@@ -32,8 +47,9 @@ const Register = () => {
       return;
     }
 
-    if (formData.password.length < 6) {
-      toast.error("Password must be at least 6 characters long");
+    const passwordValidation = validatePassword(formData.password);
+    if (!passwordValidation.isValid) {
+      toast.error(passwordValidation.message);
       return;
     }
 
@@ -49,7 +65,8 @@ const Register = () => {
       toast.success("Registration successful! Please check your email to verify your account.");
       navigate("/login");
     } catch (error: any) {
-      toast.error(error.message || "An error occurred during registration");
+      const message = error.message || "An error occurred during registration";
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }
@@ -87,6 +104,9 @@ const Register = () => {
                 onChange={handleInputChange}
                 required
               />
+              <p className="text-xs text-muted-foreground">
+                Password must contain at least one lowercase letter, one uppercase letter, and one number
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="confirm-password">Confirm Password</Label>
