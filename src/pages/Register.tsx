@@ -55,9 +55,12 @@ const Register = () => {
 
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.signUp({
+      const { error, data } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
+        options: {
+          emailRedirectTo: window.location.origin + '/login'
+        }
       });
 
       if (error) throw error;
